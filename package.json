@@ -138,8 +138,8 @@
 				"title": "Open File"
 			},
 			{
-				"command": "testView.reveal",
-				"title": "Test View: Reveal"
+				"command": "testView.changeTree",
+				"title": "Test View: Change Tree"
 			},
 			{
 				"command": "testView.changeTitle",
@@ -198,11 +198,18 @@
 				},
 				{
 					"command": "fileExplorer.refreshFile",
-					"when": "view == fileExplorer && viewItem == file",
+					"when": "view == fileExplorer && viewItem == file || view == testView ",
 					"group": "inline"
 				}
 			]
 		},
+		"keybindings": [
+			{
+				"command": "testView.changeTree",
+				"key": "ctrl+t",
+				"mac": "cmd+t"
+			}
+		],
 		"configuration": [
 			{
 				"title": "JSON Outline",

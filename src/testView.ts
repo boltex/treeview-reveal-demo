@@ -1,16 +1,21 @@
 import * as vscode from 'vscode';
 
+let testView: vscode.TreeView<{ key: string; }>;
+let testViewProvider: vscode.TreeDataProvider<{ key: string }>;
+const _onDidChangeTreeData = new vscode.EventEmitter<{ key: string } | undefined>();
+
 export class TestView {
 
 	constructor(context: vscode.ExtensionContext) {
-		const view = vscode.window.createTreeView('testView', { treeDataProvider: aNodeWithIdTreeDataProvider(), showCollapseAll: true });
+		testViewProvider = aNodeWithIdTreeDataProvider();
+		const view = vscode.window.createTreeView('testView', { treeDataProvider: testViewProvider, showCollapseAll: true });
+		testView = view;
 		context.subscriptions.push(view);
-		vscode.commands.registerCommand('testView.reveal', async () => {
-			const key = await vscode.window.showInputBox({ placeHolder: 'Type the label of the item to reveal' });
-			if (key) {
-				await view.reveal({ key }, { focus: true, select: false, expand: true });
-			}
+
+		vscode.commands.registerCommand('testView.changeTree', () => {
+			changeTree();
 		});
+
 		vscode.commands.registerCommand('testView.changeTitle', async () => {
 			const title = await vscode.window.showInputBox({ prompt: 'Type the new title for the Test View', placeHolder: view.title });
 			if (title) {
@@ -20,7 +25,9 @@ export class TestView {
 	}
 }
 
-const tree: any = {
+let treeVersion = 0;
+
+const tree1: any = {
 	'a': {
 		'aa': {
 			'aaa': {
@@ -40,16 +47,50 @@ const tree: any = {
 		'bb': {}
 	}
 };
+
+const tree2: any = {
+	'c': {
+		'cb': {},
+		'cc': {}
+	},
+	'b': {
+		'bb': {
+			'bbb': {
+				'bbbb': {
+					'bbbbb': {
+						'bbbbbb': {
+
+						}
+					}
+				}
+			}
+		},
+		'bc': {}
+	}
+};
+
+let tree = tree1;
+
 const nodes: any = {};
+
 
 function aNodeWithIdTreeDataProvider(): vscode.TreeDataProvider<{ key: string }> {
 	return {
+
+		onDidChangeTreeData: _onDidChangeTreeData.event,
+
 		getChildren: (element: { key: string }): { key: string }[] => {
 			return getChildren(element ? element.key : undefined).map(key => getNode(key));
 		},
 		getTreeItem: (element: { key: string }): vscode.TreeItem => {
 			const treeItem = getTreeItem(element.key);
-			treeItem.id = element.key;
+			if (element.key.length === 4) {
+				// Set the selected one to be the one (arbitrary choice) with 4 letters
+				gotSelected(element);
+			}
+			// tree version prefixed to id (for uniqueness when tree structure changes)
+			treeItem.id = treeVersion.toString() + element.key;
+			treeItem.tooltip = " Id is : " + treeItem.id;
 			return treeItem;
 		},
 		getParent: ({ key }: { key: string }): { key: string } | undefined => {
@@ -72,12 +113,9 @@ function getChildren(key: string | undefined): string[] {
 
 function getTreeItem(key: string): vscode.TreeItem {
 	const treeElement = getTreeElement(key);
-	// An example of how to use codicons in a MarkdownString in a tree item tooltip.
-	const tooltip = new vscode.MarkdownString(`$(zap) Tooltip for ${key}`, true);
 	return {
-		label: /**vscode.TreeItemLabel**/<any>{ label: key, highlights: key.length > 1 ? [[key.length - 2, key.length - 1]] : void 0 },
-		tooltip,
-		collapsibleState: treeElement && Object.keys(treeElement).length ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None
+		label: { label: key },
+		collapsibleState: treeElement && Object.keys(treeElement).length ? vscode.TreeItemCollapsibleState.Expanded : vscode.TreeItemCollapsibleState.None
 	};
 }
 
@@ -97,6 +135,31 @@ function getNode(key: string): { key: string } {
 		nodes[key] = new Key(key);
 	}
 	return nodes[key];
+}
+
+function changeTree(): void {
+	treeVersion = treeVersion + 1; // Increment uniqueness prefix of node ids.
+
+	// Alternate tree structure
+	if (treeVersion % 2) {
+		tree = tree2;
+	} else {
+		tree = tree1;
+	}
+	if (testViewProvider.onDidChangeTreeData) {
+		_onDidChangeTreeData.fire(undefined); // Refresh whole tree !
+	}
+
+}
+
+function gotSelected(element: { key: string }): void {
+	// Got selected ! reveal it while leaving vscode's focus where it currently already is! (so user can continue typing, etc.)
+	console.log('Trying to set selected node: ', element.key);
+	testView.reveal(element, {
+		select: true, // This sets tree selection without changing current focus location of vscode
+		// ? How to set 'cursor' without changing focus to the sidebar/treeview ?
+		focus: false // if true, This places cursor on item, AND changes focus to the treeview!
+	});
 }
 
 class Key {

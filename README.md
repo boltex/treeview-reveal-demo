@@ -1,51 +1,17 @@
-# Views & View Containers
+# Demo for reveal 'select/focus' option problem.
 
-This sample demonstrates how to implement and contribute a tree view in VS Code. This includes:
+This sample extension was branched off from the [vscode-extension-samples/tree-view-sample/](https://github.com/microsoft/vscode-extension-samples/tree/main/tree-view-sample)
 
-- Contributing views and view containers.
-- Contributing actions in various location of the view.
-- Implementing the tree data provider for the view.
-- Creating and working with the view.
+1. Open the Test View and click on a node other than the selected one to set the 'cursor focus' on a new one, then either leave the focus in the tree, or place focus in an editor pane.
 
-This sample provides following views
+2. hit CTRL+T to change the tree and set the selection automatically. (you can hit CTRL+T repeatedly to change the tree again)
 
-- Node dependencies view
-- Ftp file explorer view
+3. Notice the last 'cursor focus' position is still outlined (if focus still in tree) or that the 'ghost' of that cursor-focus' is still active with the 'refresh' icon still visible. (hovering over it will also not highlight it)
 
-Following example shows Node dependencies view in Package Explorer View container.
+## With the user having the focus in the editor, pressing CTRL+T will **leave icons on an un-hoverable node**. (the one that had the focus outline)
 
-![Package Explorer](./resources/package-explorer.png)
+![Focus was in editor](./ghost-cursor-focus-in-editor.png)
 
-## VS Code API
+## With the focus in the outline prior to pressing CTRL+T, the outline will be around the node which had focus. Even if the selection is changed with 'reveal'.
 
-This sample uses following contribution points, activation events and APIs
-
-### Contribution Points
-
-- `views`
-- `viewsContainers`
-- `menu`
-  - `view/title`
-  - `view/item/context`
-
-### Activation Events
-
-- `onView:${viewId}`
-
-### APIs
-
-- `window.createTreeView`
-- `window.registerTreeDataProvider`
-- `TreeView`
-- `TreeDataProvider`
-
-Refer to [Usage](./USAGE.md) document for more details.
-
-## Running the Sample
-
-- Open this example in VS Code Insiders
-- `npm install`
-- `npm run watch`
-- `F5` to start debugging
-- Node dependencies view is shown in Package explorer view container in Activity bar.
-- FTP file explorer view should be shown in Explorer
+![Focus was in outline](./ghost-cursor-focus-in-outline.png)
