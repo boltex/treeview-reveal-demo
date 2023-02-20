@@ -32,7 +32,7 @@ This modified treeview sample extension tries to reveal and select the node in t
 
 ## Proposed solution/feature
 
-### In order to offer the possibility of revealing a node and have it 'selected' while leaving the vscode's focus in its current pane (e.g. *to let a user continue to type in an editor*) AND without having the 'ghost' of the last focused node be apparent like in the screenshots above:
+### In order to offer the possibility of revealing a node, and have it 'selected' while leaving the vscode's focus in its current pane (e.g. *to let a user continue to type in an editor*) AND without having the 'ghost' of the last focused node be apparent like in the screenshots above:
 
 Could the 'reveal' method's option have another member called 'cursor', that when true, would set the 'focus-cursor' on the revealed node, without changing the overall focused panel of vscode?
 
