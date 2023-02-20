@@ -12,7 +12,7 @@ The only way to remove the appearance of that 'ghost-cursor' is to use the treev
 
 This sample extension was branched off from the [vscode-extension-samples/tree-view-sample/](https://github.com/microsoft/vscode-extension-samples/tree/main/tree-view-sample)
 
-This modified treeview sample extension tries to reveal and select the node in the tree that has a label of exactly 4 characters long. (arbitrary choice just to have one selected) And offers a command (CTRL+T) that changes the outline, along with the 'Id's of each nodes.
+This modified treeview sample extension tries to reveal and select the node in the tree that has a label of exactly 4 characters long. (arbitrary choice just to have one selected) And offers a command (CTRL+T) that changes the outline, along with the 'Id's of each nodes. The node with a label of 4 characters length is again revealed and selected.
 
 ### To reproduce the problem
 
@@ -31,6 +31,8 @@ This modified treeview sample extension tries to reveal and select the node in t
 ![Focus was in outline](./ghost-cursor-focus-in-outline.png)
 
 ## Proposed solution/feature
+
+### In order to offer the possibility of revealing a node and have it 'selected' while leaving the vscode's focus in its current pane (e.g. *to let a user continue to type in an editor*) AND without having the 'ghost' of the last focused node be apparent like in the screenshots above:
 
 Could the 'reveal' method's option have another member called 'cursor', that when true, would set the 'focus-cursor' on the revealed node, without changing the overall focused panel of vscode?
 
